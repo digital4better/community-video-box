@@ -1,0 +1,15 @@
+{
+  "name": "VideoBox Screen",
+  "short_name": "VideoBox Screen",
+  "start_url": "/screen",
+  "id":"VideoBoxScreen",
+  "display": "fullscreen",
+  "scope": "/",
+  "background_color": "#000",
+  "description": "A readable Hacker News app.",
+  "icons": [{
+    "src": "icone.png",
+    "sizes": "380x380",
+    "type": "image/png"
+  }]
+}

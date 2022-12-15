@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>VideoBox Phone</title>
+  </head>
+
+  <style type="text/css">
+    body {
+      overflow: hidden;
+    }
+    @keyframes glowing {
+      from {
+        opacity: 0.4;
+      }
+      to {
+        transform: scale(1.5);
+        opacity: 0;
+      }
+    }
+    button {
+      background-color: white transparent;
+      cursor: pointer;
+      border: none;
+      padding: 5px;
+      height: 70px;
+      width: 70px;
+      border-radius: 70%;
+      position: absolute;
+      animation: glowing 2s linear infinite;
+    }
+    #button-a {
+      top: 288px;
+      left: 968px;
+    }
+    #button-b {
+      top: 171px;
+      left: 546px;
+    }
+    #choice-image {
+      padding-top: 90px;
+      padding-left: 60px;
+    }
+    #make-your-choice {
+      position: absolute;
+      top: 170px;
+      left: 440px;
+    }
+  </style>
+
+  <body style="background-color: black">
+    <div id="make-your-choice" style="display: none">
+      <img src="make-your-choice.png" />
+    </div>
+
+    <div id="phone" style="display: none">
+      <img id="choice-image" src="scenario2.png" />
+      <button id="button-a" onclick="choice(CHOICE_A_MESSAGE)"></button>
+      <button id="button-b" onclick="choice(CHOICE_B_MESSAGE)"></button>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+      const CHOICE_A_MESSAGE = "choice-a";
+      const CHOICE_B_MESSAGE = "choice-b";
+
+      // Function to show Phone Or MakeYourChoice Or Nothing
+      // authorized values on input "element" = "phone" or "makeYourChoice" or "none"
+      const MAKE_YOUR_CHOICE_HTML_ELEMENT =
+        document.getElementById("make-your-choice");
+      const PHONE_HTML_ELEMENT = document.getElementById("phone");
+      function show(element) {
+        MAKE_YOUR_CHOICE_HTML_ELEMENT.style.display =
+          element === "makeYourChoice" ? "block" : "none";
+        PHONE_HTML_ELEMENT.style.display =
+          element === "phone" ? "block" : "none";
+      }
+
+      function choice(socketMessage) {
+        //console.log("emit: ", socketMessage);
+        show("none");
+        socket.emit("GeneralSocket", socketMessage);
+      }
+
+      const socket = io();
+      socket.on("GeneralSocket", function (msg) {
+        //console.log("received: ", msg);
+        if (msg == "reset") {
+          show("none");
+        }
+        if (msg == "showPhone") {
+          show("makeYourChoice");
+          setTimeout(() => {
+            show("phone");
+          }, 5000);
+        }
+      });
+    </script>
+  </body>
+</html>

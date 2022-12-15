@@ -1,0 +1,1 @@
+chromium --kiosk --autoplay-policy=no-user-gesture-required --window-position=1920,0 http://localhost:3000/screen

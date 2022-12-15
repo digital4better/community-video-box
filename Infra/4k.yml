@@ -1,0 +1,123 @@
+---
+- hosts: 127.0.0.1
+  connection: local
+  become: yes
+  roles:
+    - ansible-role-nodejs-master
+
+- hosts: 127.0.0.1
+  connection: local
+  become: yes
+  tasks:
+    - name: Ensure dependencies are present.
+      apt:
+        name:
+          - chromium
+          - unclutter
+          - python3-smbus
+          - i2c-tools
+        state: present
+
+    - name: Install pm2
+      community.general.npm:
+        name: pm2
+        global: yes
+
+    - name: Run command pm2 startup
+      ansible.builtin.command:
+        cmd: "pm2 startup"
+
+    - name: Run a command using a templated variable (always use quote filter to avoid injection)
+      ansible.builtin.shell: "env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u {{ raspberrypi_user }} --hp /home/{{ raspberrypi_user }}"
+
+    - name: Enable service httpd and ensure it is not masked
+      ansible.builtin.systemd:
+        name: fake-hwclock
+        enabled: no
+        masked: no
+
+      # Validate the sudoers file before saving
+    #    - name: Enable service vncserver-x11-serviced and ensure it is not masked
+    #      ansible.builtin.systemd:
+    #        name: vncserver-x11-serviced
+    #        enabled: yes
+    #        masked: no
+
+    #    - name: Change WIFI locales
+    #      ansible.builtin.lineinfile:
+    #        path: /etc/wpa_supplicant/wpa_supplicant.conf
+    #        state: present
+    #        regexp: '^country='
+    #        line: 'country=FR'
+    #        validate: /usr/sbin/visudo -cf %s
+
+    #   - name: Generic question with multiple different responses
+    #      ansible.builtin.expect:
+    #        command: curl -sL https://install.raspap.com | bash
+    #        responses:
+    #          Question:
+    #            - "Y"
+    #            - "Y"
+    #            - "Y"
+    #            - "Y"
+    #            - "Y"
+    #            - "n"
+    #            - "N"
+    #
+    #    - name: Hotspot config
+    #      ansible.builtin.lineinfile:
+    #        path: /etc/wpa_supplicant/wpa_supplicant.conf
+    #        state: present
+    #        regexp: 'ssid='
+    #        line: 'ssid=@@@WIFI_SSID_server@@@'
+
+    #    - name: Hotspot config
+    #      ansible.builtin.lineinfile:
+    #        path: /etc/wpa_supplicant/wpa_supplicant.conf
+    #        state: present
+    #        regexp: 'wpa_passphrase='
+    #        line: 'wpa_passphrase=@@@WIFI_Password@@@'
+
+    - name: Copy a new "dhcpcd.conf" file into place, backing up the original if it differs from the copied version
+      ansible.builtin.copy:
+        src: /home/{{ raspberrypi_user }}/infra/files/4k/dhcpcd.conf
+        dest: /etc/dhcpcd.conf
+        owner: root
+        group: netdev
+        mode: "664"
+
+    - name: Copy a new "rc.local" file into place, backing up the original if it differs from the copied version
+      ansible.builtin.copy:
+        src: /home/{{ raspberrypi_user }}/infra/files/4k/rc.local
+        dest: /etc/rc.local
+        owner: root
+        group: root
+        mode: "755"
+
+    - name: Copy script desktop
+      ansible.builtin.copy:
+        src: /home/{{ raspberrypi_user }}/infra/files/start.sh
+        dest: /home/{{ raspberrypi_user }}/Desktop/start.sh
+
+    - file:
+        path: /home/{{ raspberrypi_user }}/Desktop/start.sh
+        owner: "{{ raspberrypi_user }}"
+        group: "{{ raspberrypi_user }}"
+        mode: 0777
+
+    - name: Copy script desktop
+      ansible.builtin.copy:
+        src: /home/{{ raspberrypi_user }}/infra/files/stop.sh
+        dest: /home/{{ raspberrypi_user }}/Desktop/stop.sh
+
+    - file:
+        path: /home/{{ raspberrypi_user }}/Desktop/stop.sh
+        owner: "{{ raspberrypi_user }}"
+        group: "{{ raspberrypi_user }}"
+        mode: 0777
+
+    # - name: Change user password
+    #   user:
+    #     name: pi
+    #     update_password: always
+    #     password: "{{ newpassword|password_hash('sha512') }}"

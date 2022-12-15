@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>VideoBox Screen</title>
+  <link rel="manifest" href="manifest.json">
+<!-- Register the service worker -->
+</head>
+
+<style type="text/css">
+  body {
+         overflow:hidden;
+       }
+  p {
+  	text-align: center;
+  	color: white;
+  }
+</style>
+
+<body style="background-color: black;">
+
+  <div id="home">
+    <img src="home.png" width="100%"/>
+  </div>
+
+  <div id="divMetrage" style="display: none;">
+    <video id="videoMetrage" width="100%">
+      <source type="video/mp4" src="metrage.mp4">
+    </video>
+  </div>
+
+  <div id="divLoop" style="display: none;">
+    <video id="videoLoop" width="100%" loop>
+      <source type="video/mp4" src="loop.mp4">
+    </video>
+  </div>
+
+  <div id="divChoixA" style="display: none;">
+    <!--<video width="75%" controls autoplay>-->
+    <video id="videoChoixA" width="100%">
+      <source type="video/mp4" src="final_A.mp4">
+    </video>
+  </div>
+
+  <div id="divChoixB" style="display: none;">
+    <!--<video width="75%" controls autoplay>-->
+    <video id="videoChoixB" width="100%">
+      <source type="video/mp4" src="final_B.mp4">
+    </video>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+
+  <script src="screen.js" ></script>
+</body>
+
+</html>

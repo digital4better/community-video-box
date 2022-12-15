@@ -1,0 +1,6 @@
+node_modules
+log.txt
+video/*
+.DS_Store
+yarn.lock
+appli.bak
